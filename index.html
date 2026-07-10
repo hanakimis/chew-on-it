@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Chew On It</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #15131a;
+      --surface: #1e1b25;
+      --surface-2: #25212d;
+      --border: rgba(255, 255, 255, 0.1);
+      --text: #ece8f1;
+      --muted: #b8b1c4;
+      --quiet: #8f879b;
+      --accent: #e7b6c8;
+      --good: #8fd6b2;
+      --warn: #f0c77d;
+      --code: #111015;
+      --tap: 48px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 16px/1.5 -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    button, input, select, textarea {
+      font: inherit;
+    }
+
+    button {
+      min-height: var(--tap);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface-2);
+      color: var(--text);
+      padding: 10px 14px;
+      text-align: center;
+    }
+
+    button:active { background: #302b39; }
+    button.primary { background: var(--accent); color: #211720; border-color: transparent; font-weight: 700; }
+    button.ghost { background: transparent; }
+    button[disabled] { opacity: 0.45; }
+
+    a { color: var(--accent); }
+
+    .app-shell {
+      min-height: 100svh;
+      padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(21, 19, 26, 0.96);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(14px);
+    }
+
+    .topbar-inner {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 12px 16px;
+    }
+
+    .title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 36px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 20px;
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+
+    .counter {
+      color: var(--muted);
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    .progress-track {
+      height: 6px;
+      background: #2b2632;
+      border-radius: 6px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--good);
+      transition: width 160ms ease;
+    }
+
+    main {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 16px 16px 48px;
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .toolbar button {
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+
+    .lesson {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .lesson-header {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1.18;
+      letter-spacing: 0;
+    }
+
+    .lesson-body { padding: 16px; }
+
+    .section {
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+    }
+
+    .section:first-child {
+      margin-top: 0;
+      padding-top: 0;
+      border-top: 0;
+    }
+
+    h3 {
+      margin: 0 0 8px;
+      font-size: 15px;
+      line-height: 1.3;
+      color: var(--accent);
+      letter-spacing: 0;
+    }
+
+    p { margin: 0 0 10px; }
+    p:last-child { margin-bottom: 0; }
+
+    ul {
+      padding-left: 20px;
+      margin: 8px 0 0;
+    }
+
+    li { margin: 6px 0; }
+
+    code, pre {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    pre {
+      margin: 10px 0 0;
+      padding: 12px;
+      background: var(--code);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow-x: auto;
+      white-space: pre;
+      line-height: 1.45;
+      font-size: 13px;
+    }
+
+    .callout {
+      border: 1px solid var(--border);
+      background: #211d28;
+      border-radius: 8px;
+      padding: 12px;
+      color: var(--muted);
+    }
+
+    .answer {
+      display: none;
+      margin-top: 10px;
+      border-left: 3px solid var(--good);
+      padding-left: 10px;
+      color: var(--text);
+    }
+
+    .answer.visible { display: block; }
+
+    .demo {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #18151d;
+      padding: 12px;
+    }
+
+    .demo-output {
+      min-height: 84px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #0f0e13;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+
+    .demo-controls {
+      display: grid;
+      gap: 8px;
+    }
+
+    .two-controls { grid-template-columns: 1fr 1fr; }
+
+    .field {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    input, select {
+      min-height: var(--tap);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #100f14;
+      color: var(--text);
+      padding: 10px;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .review-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .review-row {
+      display: grid;
+      grid-template-columns: 22px 1fr;
+      gap: 8px;
+      align-items: start;
+      color: var(--muted);
+    }
+
+    .review-row input {
+      min-height: 22px;
+      margin: 2px 0 0;
+      width: 22px;
+    }
+
+    .done-row {
+      display: grid;
+      grid-template-columns: 22px 1fr;
+      gap: 8px;
+      align-items: center;
+      margin-top: 18px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #211d28;
+    }
+
+    .done-row input {
+      min-height: 22px;
+      width: 22px;
+      margin: 0;
+    }
+
+    .nav {
+      margin-top: 10px;
+    }
+
+    .nav-inner {
+      max-width: 720px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1.2fr 1fr;
+      gap: 8px;
+    }
+
+    details {
+      margin-top: 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface);
+      overflow: hidden;
+    }
+
+    summary {
+      min-height: var(--tap);
+      display: flex;
+      align-items: center;
+      padding: 12px 14px;
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    .lesson-list {
+      border-top: 1px solid var(--border);
+      max-height: 420px;
+      overflow-y: auto;
+    }
+
+    .lesson-link {
+      width: 100%;
+      min-height: 50px;
+      border: 0;
+      border-radius: 0;
+      border-bottom: 1px solid var(--border);
+      background: transparent;
+      text-align: left;
+      display: grid;
+      grid-template-columns: 32px 1fr auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .lesson-link.current { background: #25212d; }
+    .lesson-link.complete .lesson-num { color: var(--good); }
+    .lesson-num { color: var(--quiet); font-variant-numeric: tabular-nums; }
+    .lesson-stage { color: var(--quiet); font-size: 13px; }
+
+    .source-note {
+      color: var(--quiet);
+      font-size: 14px;
+      margin-top: 14px;
+    }
+
+    .dom-tree {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .component-box {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+      margin: 6px 0;
+    }
+
+    .mini-title {
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    @media (max-width: 390px) {
+      body { font-size: 15px; }
+      h2 { font-size: 22px; }
+      .nav-inner { grid-template-columns: 0.9fr 1.1fr 0.9fr; }
+      button { padding-left: 10px; padding-right: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="title-row">
+          <h1>Chew On It</h1>
+          <div class="counter" id="progressText">0 of 35</div>
+        </div>
+        <div class="progress-track" aria-label="Course progress">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <nav class="nav" aria-label="Lesson navigation">
+          <div class="nav-inner">
+            <button id="prevBtn" type="button">Previous</button>
+            <button id="markNextBtn" class="primary" type="button">Done + Next</button>
+            <button id="nextBtn" type="button">Next</button>
+          </div>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <div class="toolbar">
+        <button id="resumeBtn" class="primary" type="button">Resume</button>
+        <button id="resetBtn" class="ghost" type="button">Reset Progress</button>
+      </div>
+
+      <article class="lesson" aria-live="polite">
+        <div class="lesson-header">
+          <div class="meta">
+            <span id="lessonStage"></span>
+            <span id="lessonTime"></span>
+          </div>
+          <h2 id="lessonTitle"></h2>
+        </div>
+        <div class="lesson-body">
+          <section class="section">
+            <h3>Concept</h3>
+            <p id="concept"></p>
+          </section>
+
+          <section class="section">
+            <h3>When Reviewing Agent Code</h3>
+            <p id="reviewLens"></p>
+          </section>
+
+          <section class="section">
+            <h3>Read This Code</h3>
+            <pre><code id="codeSample"></code></pre>
+          </section>
+
+          <section class="section">
+            <h3>Try It</h3>
+            <div class="demo" id="demo"></div>
+          </section>
+
+          <section class="section">
+            <h3>Quick Check</h3>
+            <div class="callout">
+              <p id="quiz"></p>
+              <button id="answerBtn" type="button">Reveal Answer</button>
+              <p class="answer" id="answer"></p>
+            </div>
+          </section>
+
+          <label class="done-row">
+            <input type="checkbox" id="doneCheck">
+            <span>Mark this chunk reviewed</span>
+          </label>
+        </div>
+      </article>
+
+      <details>
+        <summary>Course Outline</summary>
+        <div class="lesson-list" id="lessonList"></div>
+      </details>
+
+      <p class="source-note">
+        Built from the public React Foundations path, React docs, and Joy of React curriculum themes.
+      </p>
+    </main>
+
+  </div>
+
+  <script>
+    const lessons = [
+      {
+        stage: "Orientation",
+        time: "3 min",
+        title: "What You Are Training For",
+        concept: "Your goal is not to memorize React. Your goal is to inspect agent-written React code and ask useful questions about structure, data flow, correctness, accessibility, and maintainability.",
+        reviewLens: "For every React diff, first ask: What UI state exists, where does it live, who can change it, and what user behavior proves it works?",
+        code: "function ReviewTarget() {\n  return <TripCard title=\"Kyoto\" />;\n}",
+        quiz: "What matters more for reviewing React code: knowing every API, or tracing data and behavior through the component tree?",
+        answer: "Tracing data and behavior. API details can be looked up, but review quality comes from spotting unclear ownership, accidental state, broken rendering, and missing user paths.",
+        demo: "checklist"
+      },
+      {
+        stage: "Browser Basics",
+        time: "4 min",
+        title: "HTML, DOM, And Rendered UI",
+        concept: "HTML is the initial document. The DOM is the browser's live tree of nodes. JavaScript and React update the DOM so the screen changes.",
+        reviewLens: "When code directly mutates the DOM in React, slow down. React expects UI to come from state and props; manual DOM changes can fight React's render cycle.",
+        code: "const app = document.getElementById('app');\nconst heading = document.createElement('h1');\nheading.textContent = 'Hello';\napp.appendChild(heading);",
+        quiz: "If the source HTML does not contain an h1 but DevTools does, what happened?",
+        answer: "JavaScript created or updated DOM nodes after the page loaded. The live DOM can differ from the original HTML.",
+        demo: "dom"
+      },
+      {
+        stage: "Browser Basics",
+        time: "3 min",
+        title: "Imperative vs Declarative UI",
+        concept: "Imperative code lists the steps to change the UI. Declarative code describes the UI result you want. React is declarative: render this UI for this data.",
+        reviewLens: "Prefer code that makes the desired UI obvious. A long sequence of manual operations is harder for agents and humans to keep correct.",
+        code: "// Imperative\nbutton.textContent = 'Saved';\nbutton.disabled = true;\n\n// Declarative\n<Button disabled={isSaving}>Saved</Button>",
+        quiz: "Why is declarative UI easier to review?",
+        answer: "You can compare the UI output to state in one place instead of auditing every step that might have mutated the page.",
+        demo: "declarative"
+      },
+      {
+        stage: "React Shape",
+        time: "4 min",
+        title: "Components Are Functions",
+        concept: "A React component is usually a JavaScript function that returns UI. Component names start with a capital letter so React can distinguish them from HTML tags.",
+        reviewLens: "If a component is doing data fetching, formatting, mutation, layout, and event orchestration all at once, ask whether it should be split.",
+        code: "function ReservationCard({ hotel }) {\n  return <article>{hotel.name}</article>;\n}",
+        quiz: "Why does ReservationCard start with a capital R?",
+        answer: "Capitalized JSX tags are treated as React components. Lowercase tags are treated as built-in DOM elements like div, button, and article.",
+        demo: "component"
+      },
+      {
+        stage: "React Shape",
+        time: "4 min",
+        title: "JSX Is JavaScript Markup",
+        concept: "JSX looks like HTML, but it is JavaScript syntax. Use className instead of class, close tags, and return one parent wrapper or fragment.",
+        reviewLens: "JSX mistakes often signal copied HTML. Check className, label htmlFor, self-closing tags, and whether siblings are wrapped correctly.",
+        code: "function Header() {\n  return (\n    <>\n      <h1>Trip</h1>\n      <button className=\"save\">Save</button>\n    </>\n  );\n}",
+        quiz: "Why can a component not return two adjacent JSX tags without a wrapper?",
+        answer: "A function returns one value. A fragment lets multiple JSX nodes behave as one returned value without adding an extra DOM element.",
+        demo: "jsx"
+      },
+      {
+        stage: "React Shape",
+        time: "3 min",
+        title: "Curly Braces Escape Into JavaScript",
+        concept: "Inside JSX, curly braces let you use JavaScript expressions for text, attributes, styles, and component props.",
+        reviewLens: "Check whether values are strings or expressions. A quoted prop is text; a braced prop evaluates JavaScript.",
+        code: "const city = 'Seoul';\nconst isActive = true;\n\nreturn <Badge active={isActive}>{city}</Badge>;",
+        quiz: "What is the difference between active=\"false\" and active={false}?",
+        answer: "active=\"false\" passes the string \"false\", which is truthy. active={false} passes the boolean false.",
+        demo: "propsToggle"
+      },
+      {
+        stage: "Data Flow",
+        time: "4 min",
+        title: "Props Are Inputs",
+        concept: "Props are data passed from parent to child. A child should treat props as read-only inputs and render from them.",
+        reviewLens: "When reviewing agent code, look for components that secretly modify their inputs or copy props into state without a reason.",
+        code: "function FlightRow({ flight, onSelect }) {\n  return <button onClick={() => onSelect(flight.id)}>{flight.code}</button>;\n}",
+        quiz: "Who owns flight in this example: FlightRow or its parent?",
+        answer: "The parent owns it. FlightRow receives flight as a prop and reports user intent through onSelect.",
+        demo: "props"
+      },
+      {
+        stage: "Data Flow",
+        time: "3 min",
+        title: "Children Are A Prop Too",
+        concept: "The content nested between opening and closing component tags arrives as the children prop. This is how wrapper components compose UI.",
+        reviewLens: "Prefer children when a component should frame arbitrary content. Prefer named props when the component needs specific slots or values.",
+        code: "function Panel({ children }) {\n  return <section className=\"panel\">{children}</section>;\n}\n\n<Panel><TripSummary /></Panel>",
+        quiz: "When is children better than a title/body prop pair?",
+        answer: "When the caller should control arbitrary nested UI, not just pass plain values into fixed positions.",
+        demo: "children"
+      },
+      {
+        stage: "Rendering",
+        time: "4 min",
+        title: "Conditional Rendering",
+        concept: "React uses normal JavaScript conditions. You can return early, assign JSX to a variable, use a ternary, or use && for optional content.",
+        reviewLens: "Check every branch: loading, empty, error, allowed, denied, selected, unselected. Agents often build only the happy path.",
+        code: "if (isLoading) return <Spinner />;\nif (!trip) return <EmptyState />;\n\nreturn <TripDetails trip={trip} />;",
+        quiz: "Why are explicit loading and empty branches important?",
+        answer: "They prevent blank screens and make the UI state machine visible during review.",
+        demo: "condition"
+      },
+      {
+        stage: "Rendering",
+        time: "5 min",
+        title: "Lists Need Stable Keys",
+        concept: "When rendering arrays, each sibling needs a stable key. Keys let React match old and new items when things are inserted, removed, or reordered.",
+        reviewLens: "Avoid array indexes as keys when the list can reorder, filter, insert, or delete. Look for IDs from the data model.",
+        code: "reservations.map(reservation => (\n  <ReservationRow\n    key={reservation.id}\n    reservation={reservation}\n  />\n));",
+        quiz: "When is key={index} risky?",
+        answer: "When list order can change. React may preserve the wrong child state because the key follows the position, not the real item.",
+        demo: "keys"
+      },
+      {
+        stage: "Rendering",
+        time: "4 min",
+        title: "Pure Rendering",
+        concept: "A component render should calculate UI from inputs. It should not mutate data, start network requests, or cause one-time effects during rendering.",
+        reviewLens: "If rendering has side effects, Strict Mode and rerenders can expose duplicate work. Move effects to event handlers, framework loaders, or useEffect when appropriate.",
+        code: "function Total({ items }) {\n  const total = items.reduce((sum, item) => sum + item.price, 0);\n  return <strong>{total}</strong>;\n}",
+        quiz: "Is calculating a total during render a side effect?",
+        answer: "No. It is derived data. Mutating the items array or sending analytics during render would be a side effect.",
+        demo: "pure"
+      },
+      {
+        stage: "Interactivity",
+        time: "4 min",
+        title: "Event Handlers Are Passed, Not Called",
+        concept: "Pass a function to event props like onClick. Do not call the function while rendering unless you intentionally want its return value.",
+        reviewLens: "Look for onClick={save()} bugs. That calls save during render. Usually you want onClick={save} or onClick={() => save(id)}.",
+        code: "<button onClick={save}>Save</button>\n<button onClick={() => save(trip.id)}>Save Trip</button>",
+        quiz: "What is wrong with onClick={save(trip.id)}?",
+        answer: "It calls save immediately during render. Wrap it in a function so React can call it later when the user clicks.",
+        demo: "events"
+      },
+      {
+        stage: "State",
+        time: "5 min",
+        title: "useState Gives Memory",
+        concept: "State is component memory. Calling the setter schedules a rerender with a new value.",
+        reviewLens: "Ask whether each piece of state is truly needed. If it can be calculated from props or other state, it may be derived data instead.",
+        code: "const [count, setCount] = useState(0);\n\nfunction addOne() {\n  setCount(count + 1);\n}",
+        quiz: "What makes state different from a normal variable?",
+        answer: "State persists across renders and tells React to rerender when it changes. A normal local variable resets on every render.",
+        demo: "counter"
+      },
+      {
+        stage: "State",
+        time: "4 min",
+        title: "State Is A Snapshot",
+        concept: "During one render, state values are fixed snapshots. Calling a setter does not change the variable you already have in the current function call.",
+        reviewLens: "When multiple updates depend on the previous value, prefer functional updates like setCount(c => c + 1).",
+        code: "setCount(count + 1);\nsetCount(count + 1); // still based on the same snapshot\n\nsetCount(c => c + 1);\nsetCount(c => c + 1);",
+        quiz: "Which version handles two increments reliably?",
+        answer: "The functional updater version. Each update receives the latest queued value.",
+        demo: "snapshot"
+      },
+      {
+        stage: "State",
+        time: "4 min",
+        title: "Updating Objects In State",
+        concept: "Do not mutate objects in state. Create a new object with the changed fields so React can see the state changed.",
+        reviewLens: "Flag code that does state.user.name = value followed by setState(state). It keeps the same object reference and can produce stale UI.",
+        code: "setTrip({\n  ...trip,\n  title: nextTitle\n});",
+        quiz: "Why use the spread operator when updating state objects?",
+        answer: "It creates a new object while preserving unchanged fields. React can compare the reference and rerender predictably.",
+        demo: "objectState"
+      },
+      {
+        stage: "State",
+        time: "4 min",
+        title: "Updating Arrays In State",
+        concept: "Use non-mutating array operations such as map, filter, slice, and spread. Avoid push, splice, and sort directly on state arrays.",
+        reviewLens: "If the agent mutates arrays in place, ask for immutable updates. This reduces subtle bugs and makes diffs easier to reason about.",
+        code: "setStops(stops.map(stop =>\n  stop.id === id ? { ...stop, done: true } : stop\n));",
+        quiz: "Why is stops.push(newStop) not enough?",
+        answer: "It mutates the existing array. React may not detect a meaningful state change, and other references now see unexpected changes.",
+        demo: "arrayState"
+      },
+      {
+        stage: "State Design",
+        time: "5 min",
+        title: "Derived State Is Usually A Smell",
+        concept: "If a value can be calculated from existing props or state during render, you usually do not need to store it separately.",
+        reviewLens: "Duplicated state can drift. Check for fullName stored next to firstName and lastName, selectedItem stored next to selectedId and items, or total stored next to cart lines.",
+        code: "const selectedTrip = trips.find(trip => trip.id === selectedTripId);\nconst totalNights = stays.reduce((sum, stay) => sum + stay.nights, 0);",
+        quiz: "Why store selectedTripId instead of selectedTrip?",
+        answer: "The ID is the source of truth. The selected object can be derived from the current list, so it cannot drift from the list data.",
+        demo: "derived"
+      },
+      {
+        stage: "State Design",
+        time: "5 min",
+        title: "Lift State To The Common Owner",
+        concept: "When sibling components need to coordinate, move shared state up to their closest common parent and pass values and callbacks down.",
+        reviewLens: "If two siblings keep duplicate state and try to sync through effects, ask whether one parent should own the value.",
+        code: "function TripEditor() {\n  const [selectedId, setSelectedId] = useState(null);\n  return <>\n    <TripList selectedId={selectedId} onSelect={setSelectedId} />\n    <TripPreview selectedId={selectedId} />\n  </>;\n}",
+        quiz: "Why does the parent own selectedId here?",
+        answer: "Both children need the same selection. The parent is their shared owner and can keep them consistent.",
+        demo: "lift"
+      },
+      {
+        stage: "Forms",
+        time: "4 min",
+        title: "Controlled Inputs",
+        concept: "A controlled input gets its value from React state and reports changes through onChange. The UI and state stay in sync.",
+        reviewLens: "For forms, check validation, reset behavior, submission state, disabled states, and whether the input can get stuck because value updates are missing.",
+        code: "const [title, setTitle] = useState('');\n\n<input\n  value={title}\n  onChange={event => setTitle(event.target.value)}\n/>",
+        quiz: "What two props usually make a text input controlled?",
+        answer: "value and onChange. value reads from state, and onChange updates that state.",
+        demo: "form"
+      },
+      {
+        stage: "Forms",
+        time: "3 min",
+        title: "Form Submission",
+        concept: "Browser forms submit by default and reload the page. React form handlers commonly call preventDefault before running save logic.",
+        reviewLens: "Review loading, duplicate submit prevention, error display, and whether failed submissions preserve user input.",
+        code: "function handleSubmit(event) {\n  event.preventDefault();\n  saveTrip(formState);\n}",
+        quiz: "Why call event.preventDefault in a React form submit handler?",
+        answer: "It stops the browser's default page reload so your React code can validate, save, and show results in place.",
+        demo: "submit"
+      },
+      {
+        stage: "Effects",
+        time: "5 min",
+        title: "Effects Synchronize With Outside Systems",
+        concept: "useEffect is for syncing React with things outside React: subscriptions, timers, DOM APIs, browser storage, and network calls not handled by your framework.",
+        reviewLens: "Do not let agents use effects as a default place for all logic. Many calculations and event responses do not need an effect.",
+        code: "useEffect(() => {\n  document.title = `${tripName} itinerary`;\n}, [tripName]);",
+        quiz: "Is filtering an array for display usually an effect?",
+        answer: "No. Filtering display data is derived rendering logic. Effects are for synchronization with systems outside React.",
+        demo: "effect"
+      },
+      {
+        stage: "Effects",
+        time: "5 min",
+        title: "Effect Dependencies",
+        concept: "The dependency array declares which reactive values an effect uses. Missing dependencies can cause stale values; extra unstable dependencies can cause loops.",
+        reviewLens: "If an effect disables lint rules, inspect carefully. Usually the code should be restructured rather than hiding dependency problems.",
+        code: "useEffect(() => {\n  const id = setInterval(refresh, 30000);\n  return () => clearInterval(id);\n}, [refresh]);",
+        quiz: "Why return a cleanup function from an interval effect?",
+        answer: "To stop the previous interval when the effect reruns or the component unmounts. Otherwise work can duplicate or leak.",
+        demo: "deps"
+      },
+      {
+        stage: "Refs",
+        time: "4 min",
+        title: "Refs Hold Mutable Values",
+        concept: "useRef stores a mutable value that persists across renders without causing a rerender when it changes. It is also used for DOM node access.",
+        reviewLens: "Refs are useful escape hatches, but they can hide state. If UI should update when a value changes, use state instead.",
+        code: "const inputRef = useRef(null);\n\nfunction focusSearch() {\n  inputRef.current?.focus();\n}",
+        quiz: "Should a visible counter be stored only in a ref?",
+        answer: "No. If the UI must update when the value changes, it belongs in state. A ref changing does not rerender.",
+        demo: "ref"
+      },
+      {
+        stage: "Hooks",
+        time: "4 min",
+        title: "Rules Of Hooks",
+        concept: "Hooks must be called at the top level of React components or custom hooks. Do not call them inside conditions, loops, or nested functions.",
+        reviewLens: "If an agent puts useState or useEffect inside an if branch, ask for a rewrite. Hook order must stay the same on every render.",
+        code: "function TripScreen({ enabled }) {\n  const [trip, setTrip] = useState(null);\n\n  if (!enabled) return null;\n  return <TripDetails trip={trip} />;\n}",
+        quiz: "Why are conditional hooks unsafe?",
+        answer: "React matches hook state by call order. If the order changes between renders, React cannot reliably associate state with each hook.",
+        demo: "hooks"
+      },
+      {
+        stage: "Hooks",
+        time: "5 min",
+        title: "Custom Hooks Extract Behavior",
+        concept: "A custom hook is a function starting with use that combines hooks into reusable behavior. It returns values and functions, not JSX.",
+        reviewLens: "Good custom hooks reduce repeated state/effect logic. Avoid hooks that hide too many unrelated responsibilities behind one name.",
+        code: "function useDisclosure(initialOpen = false) {\n  const [open, setOpen] = useState(initialOpen);\n  return {\n    open,\n    show: () => setOpen(true),\n    hide: () => setOpen(false)\n  };\n}",
+        quiz: "Why must a custom hook name start with use?",
+        answer: "React tooling and lint rules use the naming convention to enforce hook rules inside that function.",
+        demo: "customHook"
+      },
+      {
+        stage: "Component Design",
+        time: "5 min",
+        title: "Design Props Deliberately",
+        concept: "A component API is the set of props, events, and children it exposes. Good APIs are clear about ownership and flexibility.",
+        reviewLens: "Ask whether props are too vague, too many, or conflicting. Prefer names that match the domain and make invalid states harder to express.",
+        code: "<ReservationStatus\n  status=\"confirmed\"\n  updatedAt={reservation.updatedAt}\n/>\n\n// Better than several booleans that can conflict.",
+        quiz: "Why can several boolean props be risky for one status?",
+        answer: "They can create impossible combinations, like isConfirmed and isCancelled both true. A single status value models the domain better.",
+        demo: "api"
+      },
+      {
+        stage: "Component Design",
+        time: "4 min",
+        title: "Composition Beats Configuration",
+        concept: "Sometimes passing JSX as children or slots is cleaner than adding many flags. Composition lets callers assemble behavior from smaller pieces.",
+        reviewLens: "If a component has many mode flags, check whether smaller components or children would make the design clearer.",
+        code: "<Dialog title=\"Delete trip\">\n  <p>This cannot be undone.</p>\n  <Button tone=\"danger\">Delete</Button>\n</Dialog>",
+        quiz: "What is a warning sign that configuration has gone too far?",
+        answer: "A component has many optional props that interact in unclear ways, or callers pass several booleans to force one layout.",
+        demo: "composition"
+      },
+      {
+        stage: "Quality",
+        time: "5 min",
+        title: "Accessibility Is A Code Review Topic",
+        concept: "React does not automatically make UI accessible. Buttons, labels, keyboard behavior, focus, and semantic HTML still matter.",
+        reviewLens: "Prefer real buttons for actions and anchors for navigation. Check labels, focus management, disabled states, alt text, and keyboard paths.",
+        code: "<label htmlFor=\"hotelName\">Hotel name</label>\n<input id=\"hotelName\" value={name} onChange={updateName} />\n\n<button type=\"button\" onClick={save}>Save</button>",
+        quiz: "Why not use a clickable div for a normal action?",
+        answer: "A button already supports keyboard activation, focus, disabled behavior, and correct semantics. A div must reimplement all of that.",
+        demo: "a11y"
+      },
+      {
+        stage: "Quality",
+        time: "4 min",
+        title: "TypeScript Props As Contracts",
+        concept: "TypeScript makes component inputs explicit. Prop types document what the component needs and catch many integration mistakes before runtime.",
+        reviewLens: "Look for any, vague object props, or duplicated types. Good prop types make ownership and allowed values visible.",
+        code: "type ReservationStatus = 'draft' | 'confirmed' | 'cancelled';\n\ntype Props = {\n  status: ReservationStatus;\n  onConfirm: () => void;\n};",
+        quiz: "Why is a union type better than status: string?",
+        answer: "It limits callers to known valid states and helps reviewers see the domain choices directly in code.",
+        demo: "types"
+      },
+      {
+        stage: "Next.js",
+        time: "5 min",
+        title: "React Library vs Next.js Framework",
+        concept: "React builds UI. Next.js adds application structure such as routing, rendering choices, data fetching patterns, caching, and deployment conventions.",
+        reviewLens: "When reviewing Next.js code, separate React component concerns from framework concerns like server/client boundaries, route structure, caching, and data loading.",
+        code: "// React concern\nfunction TripCard({ trip }) { return <article>{trip.name}</article>; }\n\n// Next.js concern\nexport default async function Page() { return <TripPage />; }",
+        quiz: "What does Next.js add on top of React?",
+        answer: "Framework structure: routing, rendering strategies, data loading conventions, caching, build tooling, and deployment integration.",
+        demo: "next"
+      },
+      {
+        stage: "Next.js",
+        time: "5 min",
+        title: "Server And Client Components",
+        concept: "In the Next.js App Router, components are server components by default. Client components opt in with 'use client' when they need browser-only APIs, state, effects, or event handlers.",
+        reviewLens: "Do not add 'use client' casually. It moves code to the browser bundle. Use it at the smallest boundary that needs interactivity.",
+        code: "'use client';\n\nexport function SaveButton() {\n  const [saving, setSaving] = useState(false);\n  return <button disabled={saving}>Save</button>;\n}",
+        quiz: "What usually requires a client component?",
+        answer: "Interactive browser behavior: useState, useEffect, event handlers, refs to DOM nodes, and browser APIs such as localStorage.",
+        demo: "serverClient"
+      },
+      {
+        stage: "Next.js",
+        time: "4 min",
+        title: "Data Fetching Decisions",
+        concept: "Data can be loaded on the server, in client components, through actions, or through API routes. The right choice depends on freshness, secrecy, interactivity, and caching.",
+        reviewLens: "Ask where data is fetched and why. Server loading can protect secrets and reduce client work; client loading can support highly interactive refreshes.",
+        code: "export default async function Page() {\n  const trip = await getTrip();\n  return <TripDetails trip={trip} />;\n}",
+        quiz: "Why fetch private API data on the server when possible?",
+        answer: "Server code can keep secrets out of the browser and send the client only the data needed for rendering.",
+        demo: "data"
+      },
+      {
+        stage: "Agent Review",
+        time: "5 min",
+        title: "The React Diff Review Loop",
+        concept: "Use a repeatable loop: identify state, trace data flow, check branches, inspect effects, test interactions, and look for accessible semantics.",
+        reviewLens: "Give agents specific feedback: name the risky state, missing branch, wrong owner, unstable key, unnecessary effect, or inaccessible control.",
+        code: "Review order:\n1. Inputs and ownership\n2. State and derived values\n3. Render branches\n4. Events and mutations\n5. Effects and cleanup\n6. Accessibility and tests",
+        quiz: "What kind of feedback is more useful: 'clean this up' or 'selectedTrip duplicates selectedTripId and can drift'?",
+        answer: "The second. It identifies the exact code smell and the reason it matters.",
+        demo: "reviewLoop"
+      },
+      {
+        stage: "Agent Review",
+        time: "4 min",
+        title: "Common Agent React Smells",
+        concept: "Agents often overuse effects, duplicate state, mutate arrays, skip edge states, use unstable keys, add broad client boundaries, and build custom controls without semantics.",
+        reviewLens: "Treat these as review prompts, not automatic failures. Ask for a concrete rewrite when the smell creates real risk.",
+        code: "Smell -> Ask\nuseEffect for derived data -> calculate during render\nkey={index} -> use stable data id\nstate.push(item) -> setState([...state, item])\nclickable div -> button or link",
+        quiz: "Why call them smells instead of always-bugs?",
+        answer: "Context matters. A smell is a signal to inspect and ask whether the tradeoff is justified.",
+        demo: "smells"
+      },
+      {
+        stage: "Practice",
+        time: "5 min",
+        title: "Mini Review Drill",
+        concept: "Practice reviewing small snippets before reviewing large agent changes. The habit is to explain the risk and propose the smallest clear fix.",
+        reviewLens: "Your final review comment should include the observed issue, why it matters, and the preferred code shape.",
+        code: "function Stops({ stops }) {\n  return stops.map((stop, index) => (\n    <StopRow key={index} stop={stop} />\n  ));\n}",
+        quiz: "What review comment would you leave?",
+        answer: "Use a stable key from stop.id instead of index if stops can be inserted, removed, filtered, or reordered. Otherwise child state can attach to the wrong stop.",
+        demo: "drill"
+      }
+    ];
+
+    const state = {
+      current: Number(localStorage.getItem("reactGym.current") || 0),
+      complete: new Set(JSON.parse(localStorage.getItem("reactGym.complete") || "[]"))
+    };
+
+    const el = {
+      progressText: document.getElementById("progressText"),
+      progressFill: document.getElementById("progressFill"),
+      lessonStage: document.getElementById("lessonStage"),
+      lessonTime: document.getElementById("lessonTime"),
+      lessonTitle: document.getElementById("lessonTitle"),
+      concept: document.getElementById("concept"),
+      reviewLens: document.getElementById("reviewLens"),
+      codeSample: document.getElementById("codeSample"),
+      demo: document.getElementById("demo"),
+      quiz: document.getElementById("quiz"),
+      answer: document.getElementById("answer"),
+      answerBtn: document.getElementById("answerBtn"),
+      doneCheck: document.getElementById("doneCheck"),
+      prevBtn: document.getElementById("prevBtn"),
+      nextBtn: document.getElementById("nextBtn"),
+      markNextBtn: document.getElementById("markNextBtn"),
+      resumeBtn: document.getElementById("resumeBtn"),
+      resetBtn: document.getElementById("resetBtn"),
+      lessonList: document.getElementById("lessonList")
+    };
+
+    function persist() {
+      localStorage.setItem("reactGym.current", String(state.current));
+      localStorage.setItem("reactGym.complete", JSON.stringify([...state.complete]));
+    }
+
+    function completionPercent() {
+      return Math.round((state.complete.size / lessons.length) * 100);
+    }
+
+    function render() {
+      const lesson = lessons[state.current];
+      el.progressText.textContent = `${state.complete.size} of ${lessons.length}`;
+      el.progressFill.style.width = `${completionPercent()}%`;
+      el.lessonStage.textContent = `${state.current + 1}. ${lesson.stage}`;
+      el.lessonTime.textContent = lesson.time;
+      el.lessonTitle.textContent = lesson.title;
+      el.concept.textContent = lesson.concept;
+      el.reviewLens.textContent = lesson.reviewLens;
+      el.codeSample.textContent = lesson.code;
+      el.quiz.textContent = lesson.quiz;
+      el.answer.textContent = lesson.answer;
+      el.answer.classList.remove("visible");
+      el.answerBtn.textContent = "Reveal Answer";
+      el.doneCheck.checked = state.complete.has(state.current);
+      el.prevBtn.disabled = state.current === 0;
+      el.nextBtn.disabled = state.current === lessons.length - 1;
+      renderDemo(lesson.demo);
+      renderLessonList();
+      persist();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function renderLessonList() {
+      el.lessonList.innerHTML = "";
+      lessons.forEach((lesson, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "lesson-link";
+        if (index === state.current) button.classList.add("current");
+        if (state.complete.has(index)) button.classList.add("complete");
+        button.innerHTML = `
+          <span class="lesson-num">${state.complete.has(index) ? "OK" : String(index + 1).padStart(2, "0")}</span>
+          <span>${lesson.title}</span>
+          <span class="lesson-stage">${lesson.time}</span>
+        `;
+        button.addEventListener("click", () => {
+          state.current = index;
+          render();
+        });
+        el.lessonList.appendChild(button);
+      });
+    }
+
+    function setDemo(html) {
+      el.demo.innerHTML = html;
+    }
+
+    function renderDemo(type) {
+      const demos = {
+        checklist: () => setDemo(`
+          <div class="review-list">
+            <label class="review-row"><input type="checkbox"><span>I can point to the source of truth for the UI.</span></label>
+            <label class="review-row"><input type="checkbox"><span>I can name the user action that changes it.</span></label>
+            <label class="review-row"><input type="checkbox"><span>I can describe the empty, loading, and error states.</span></label>
+          </div>
+        `),
+        dom: () => {
+          setDemo(`
+            <div class="demo-output"><div id="domOutput" class="dom-tree">&lt;div id="app"&gt;&lt;/div&gt;</div></div>
+            <div class="demo-controls two-controls">
+              <button type="button" id="domAdd">Append h1</button>
+              <button type="button" id="domReset">Reset</button>
+            </div>
+          `);
+          document.getElementById("domAdd").onclick = () => {
+            document.getElementById("domOutput").textContent = "<div id=\"app\">\n  <h1>Hello</h1>\n</div>";
+          };
+          document.getElementById("domReset").onclick = () => {
+            document.getElementById("domOutput").textContent = "<div id=\"app\"></div>";
+          };
+        },
+        declarative: () => {
+          setDemo(`
+            <div class="demo-output" id="declOutput">Button state: idle</div>
+            <div class="demo-controls two-controls">
+              <button type="button" id="declIdle">Idle</button>
+              <button type="button" id="declSaved">Saved</button>
+            </div>
+          `);
+          const output = document.getElementById("declOutput");
+          document.getElementById("declIdle").onclick = () => output.textContent = "Button state: idle";
+          document.getElementById("declSaved").onclick = () => output.textContent = "Button state: saved and disabled";
+        },
+        component: () => setDemo(`
+          <div class="demo-output">
+            <div class="component-box">
+              <div class="mini-title">ReservationCard</div>
+              <div>Hotel: Park Hyatt Kyoto</div>
+            </div>
+            <div class="component-box">
+              <div class="mini-title">ReservationCard</div>
+              <div>Train: Shinkansen Hikari</div>
+            </div>
+          </div>
+          <p class="source-note">Same component shape, different props.</p>
+        `),
+        jsx: () => setDemo(`
+          <div class="demo-output">
+            <div class="dom-tree">JSX rules to spot:<br>className, htmlFor, closed tags, one parent return value.</div>
+          </div>
+        `),
+        propsToggle: () => {
+          setDemo(`
+            <div class="demo-output" id="propsToggleOut">active={false} is a boolean false.</div>
+            <div class="demo-controls two-controls">
+              <button type="button" id="boolFalse">active={false}</button>
+              <button type="button" id="stringFalse">active="false"</button>
+            </div>
+          `);
+          const output = document.getElementById("propsToggleOut");
+          document.getElementById("boolFalse").onclick = () => output.textContent = "Boolean false: component can treat this as off.";
+          document.getElementById("stringFalse").onclick = () => output.textContent = "String \"false\": still a non-empty truthy value.";
+        },
+        props: () => setDemo(`
+          <div class="demo-output">
+            Parent owns: flight data and selected ID.<br>
+            Child receives: flight prop and onSelect callback.<br>
+            Child says: "user selected flight AF267."
+          </div>
+        `),
+        children: () => setDemo(`
+          <div class="demo-output">
+            <div class="component-box">
+              <div class="mini-title">Panel frame</div>
+              <div>Children content can be text, buttons, forms, or another component.</div>
+            </div>
+          </div>
+        `),
+        condition: () => {
+          setDemo(`
+            <div class="demo-output" id="conditionOut">Render branch: loading spinner</div>
+            <div class="demo-controls">
+              <select id="conditionSelect" aria-label="Render branch">
+                <option value="loading">loading</option>
+                <option value="empty">empty</option>
+                <option value="error">error</option>
+                <option value="ready">ready</option>
+              </select>
+            </div>
+          `);
+          const output = document.getElementById("conditionOut");
+          document.getElementById("conditionSelect").onchange = event => {
+            output.textContent = `Render branch: ${event.target.value}`;
+          };
+        },
+        keys: () => {
+          let rows = ["Aiko", "Hana", "Mina"];
+          setDemo(`
+            <div class="demo-output" id="keysOut"></div>
+            <div class="demo-controls two-controls">
+              <button type="button" id="reorderRows">Reorder</button>
+              <button type="button" id="resetRows">Reset</button>
+            </div>
+          `);
+          const renderRows = () => {
+            document.getElementById("keysOut").innerHTML = rows.map((name, index) => (
+              `<div class="component-box"><strong>${index}</strong> ${name} <span class="tag">key should be ID</span></div>`
+            )).join("");
+          };
+          document.getElementById("reorderRows").onclick = () => { rows = [...rows].reverse(); renderRows(); };
+          document.getElementById("resetRows").onclick = () => { rows = ["Aiko", "Hana", "Mina"]; renderRows(); };
+          renderRows();
+        },
+        pure: () => setDemo(`
+          <div class="demo-output">Pure render: same inputs produce same UI. No network calls, mutations, timers, or storage writes during render.</div>
+        `),
+        events: () => {
+          setDemo(`
+            <div class="demo-output" id="eventOut">No click yet.</div>
+            <button type="button" id="eventBtn">Call handler on click</button>
+          `);
+          document.getElementById("eventBtn").onclick = () => {
+            document.getElementById("eventOut").textContent = "The handler ran because the user clicked.";
+          };
+        },
+        counter: () => {
+          let count = 0;
+          setDemo(`
+            <div class="demo-output" id="counterOut">Count: 0</div>
+            <button type="button" id="countBtn">Increment</button>
+          `);
+          document.getElementById("countBtn").onclick = () => {
+            count += 1;
+            document.getElementById("counterOut").textContent = `Count: ${count}`;
+          };
+        },
+        snapshot: () => {
+          let count = 0;
+          setDemo(`
+            <div class="demo-output" id="snapshotOut">Count: 0</div>
+            <div class="demo-controls two-controls">
+              <button type="button" id="badDouble">Snapshot double</button>
+              <button type="button" id="goodDouble">Updater double</button>
+            </div>
+          `);
+          const output = document.getElementById("snapshotOut");
+          document.getElementById("badDouble").onclick = () => {
+            const snapshot = count;
+            count = snapshot + 1;
+            count = snapshot + 1;
+            output.textContent = `Count: ${count} (same snapshot twice)`;
+          };
+          document.getElementById("goodDouble").onclick = () => {
+            count = count + 1;
+            count = count + 1;
+            output.textContent = `Count: ${count} (two updater-style steps)`;
+          };
+        },
+        objectState: () => setDemo(`
+          <div class="demo-output">
+            Bad: trip.title = nextTitle<br>
+            Good: setTrip({ ...trip, title: nextTitle })
+          </div>
+        `),
+        arrayState: () => setDemo(`
+          <div class="demo-output">
+            Add: setItems([...items, item])<br>
+            Remove: setItems(items.filter(item => item.id !== id))<br>
+            Change: setItems(items.map(item => item.id === id ? next : item))
+          </div>
+        `),
+        derived: () => {
+          setDemo(`
+            <div class="demo-output" id="derivedOut">2 nights x $180 = $360</div>
+            <div class="demo-controls two-controls">
+              <label class="field">Nights<input id="nights" type="number" min="1" value="2"></label>
+              <label class="field">Rate<input id="rate" type="number" min="1" value="180"></label>
+            </div>
+          `);
+          const update = () => {
+            const nights = Number(document.getElementById("nights").value || 0);
+            const rate = Number(document.getElementById("rate").value || 0);
+            document.getElementById("derivedOut").textContent = `${nights} nights x $${rate} = $${nights * rate}`;
+          };
+          document.getElementById("nights").oninput = update;
+          document.getElementById("rate").oninput = update;
+        },
+        lift: () => setDemo(`
+          <div class="demo-output">
+            TripEditor owns selectedId.<br>
+            TripList receives selectedId and onSelect.<br>
+            TripPreview receives selectedId.
+          </div>
+        `),
+        form: () => {
+          setDemo(`
+            <div class="demo-output" id="formOut">State value: Kyoto</div>
+            <label class="field">Trip title<input id="formInput" value="Kyoto"></label>
+          `);
+          document.getElementById("formInput").oninput = event => {
+            document.getElementById("formOut").textContent = `State value: ${event.target.value}`;
+          };
+        },
+        submit: () => setDemo(`
+          <div class="demo-output">Review form states: idle, validating, saving, saved, failed. Also test double tap.</div>
+        `),
+        effect: () => setDemo(`
+          <div class="demo-output">Effect-worthy: document title, timer, subscription, localStorage, external widget. Not effect-worthy: filtering a list for display.</div>
+        `),
+        deps: () => setDemo(`
+          <div class="demo-output">Dependency rule: every reactive value used inside the effect should either be listed or intentionally stabilized.</div>
+        `),
+        ref: () => {
+          setDemo(`
+            <div class="demo-output">Tap focus to move focus into the input without storing visible UI state.</div>
+            <div class="demo-controls">
+              <input id="refInput" placeholder="Search trips">
+              <button type="button" id="focusInput">Focus input</button>
+            </div>
+          `);
+          document.getElementById("focusInput").onclick = () => document.getElementById("refInput").focus();
+        },
+        hooks: () => setDemo(`
+          <div class="demo-output">Safe shape: call hooks first, then branch your returned UI. Hook order stays stable.</div>
+        `),
+        customHook: () => setDemo(`
+          <div class="demo-output">Custom hook test: can you name what behavior it owns in one sentence? If not, it probably does too much.</div>
+        `),
+        api: () => setDemo(`
+          <div class="demo-output">
+            Prefer: status="confirmed"<br>
+            Avoid: isDraft={false} isConfirmed={true} isCancelled={false}
+          </div>
+        `),
+        composition: () => setDemo(`
+          <div class="demo-output">Composition keeps the wrapper stable while the caller controls meaningful content.</div>
+        `),
+        a11y: () => setDemo(`
+          <div class="demo-output">
+            Native controls carry behavior for free: keyboard, focus, role, disabled state, and form behavior.
+          </div>
+        `),
+        types: () => setDemo(`
+          <div class="demo-output">A narrow union type turns a review question into a compiler question: is this status allowed?</div>
+        `),
+        next: () => setDemo(`
+          <div class="demo-output">
+            React question: what should the UI render?<br>
+            Next.js question: where should this route load and render data?
+          </div>
+        `),
+        serverClient: () => setDemo(`
+          <div class="demo-output">'use client' is a boundary. Put it near the interactive leaf, not at the whole page by default.</div>
+        `),
+        data: () => setDemo(`
+          <div class="demo-output">Server fetch: secrets and cache control. Client fetch: browser-driven refresh and local interaction.</div>
+        `),
+        reviewLoop: () => setDemo(`
+          <div class="demo-output">
+            <div class="pill-row">
+              <span class="tag">ownership</span><span class="tag">state</span><span class="tag">branches</span><span class="tag">events</span><span class="tag">effects</span><span class="tag">a11y</span>
+            </div>
+          </div>
+        `),
+        smells: () => setDemo(`
+          <div class="demo-output">Smell spotting is a triage skill. Find the risk, then decide whether the code needs a rewrite or just a note.</div>
+        `),
+        drill: () => setDemo(`
+          <div class="demo-output">Comment formula: observed issue + why it matters + preferred code shape.</div>
+        `)
+      };
+
+      (demos[type] || demos.checklist)();
+    }
+
+    function markCurrentComplete() {
+      state.complete.add(state.current);
+      persist();
+    }
+
+    el.answerBtn.addEventListener("click", () => {
+      el.answer.classList.toggle("visible");
+      el.answerBtn.textContent = el.answer.classList.contains("visible") ? "Hide Answer" : "Reveal Answer";
+    });
+
+    el.doneCheck.addEventListener("change", () => {
+      if (el.doneCheck.checked) state.complete.add(state.current);
+      else state.complete.delete(state.current);
+      render();
+    });
+
+    el.prevBtn.addEventListener("click", () => {
+      if (state.current > 0) {
+        state.current -= 1;
+        render();
+      }
+    });
+
+    el.nextBtn.addEventListener("click", () => {
+      if (state.current < lessons.length - 1) {
+        state.current += 1;
+        render();
+      }
+    });
+
+    el.markNextBtn.addEventListener("click", () => {
+      markCurrentComplete();
+      if (state.current < lessons.length - 1) state.current += 1;
+      render();
+    });
+
+    el.resumeBtn.addEventListener("click", () => {
+      const firstOpen = lessons.findIndex((_, index) => !state.complete.has(index));
+      state.current = firstOpen === -1 ? lessons.length - 1 : firstOpen;
+      render();
+    });
+
+    el.resetBtn.addEventListener("click", () => {
+      const confirmed = window.confirm("Reset Chew On It progress on this device?");
+      if (!confirmed) return;
+      state.current = 0;
+      state.complete.clear();
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-# Chew On It
+# chew-on-it
 
 A standalone review page for practicing React fundamentals.
 

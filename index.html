@@ -124,6 +124,25 @@
       margin-bottom: 12px;
     }
 
+    .course-switch {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .course-switch a {
+      padding: 10px 2px 9px;
+      color: var(--muted);
+      text-decoration: none;
+      border-bottom: 2px solid transparent;
+    }
+
+    .course-switch a[aria-current="page"] {
+      color: var(--text);
+      border-bottom-color: var(--accent);
+    }
+
     .toolbar button {
       padding-left: 10px;
       padding-right: 10px;
@@ -428,6 +447,11 @@
     </header>
 
     <main>
+      <nav class="course-switch" aria-label="Courses">
+        <a href="index.html" aria-current="page">React</a>
+        <a href="typography.html">Typography</a>
+      </nav>
+
       <div class="toolbar">
         <button id="resumeBtn" class="primary" type="button">Resume</button>
         <button id="resetBtn" class="ghost" type="button">Reset Progress</button>

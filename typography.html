@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Typography · chew-on-it</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #15131a;
+      --surface: #1e1b25;
+      --surface-2: #25212d;
+      --border: rgba(255, 255, 255, 0.1);
+      --text: #ece8f1;
+      --muted: #b8b1c4;
+      --quiet: #8f879b;
+      --accent: #e7b6c8;
+      --good: #8fd6b2;
+      --code: #111015;
+      --tap: 48px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 16px/1.5 -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+    button, input, select { font: inherit; }
+    button {
+      min-height: var(--tap);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface-2);
+      color: var(--text);
+      padding: 10px 14px;
+    }
+    button:active { background: #302b39; }
+    button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+    button.primary { background: var(--accent); color: #211720; border-color: transparent; font-weight: 700; }
+    button.ghost { background: transparent; }
+    button[disabled] { opacity: 0.45; }
+    a { color: var(--accent); }
+    .app-shell { min-height: 100svh; padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(21, 19, 26, 0.96);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(14px);
+    }
+    .topbar-inner, main { max-width: 720px; margin: 0 auto; }
+    .topbar-inner { padding: 12px 16px; }
+    .title-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 36px; }
+    h1 { margin: 0; font-size: 20px; line-height: 1.2; }
+    .counter { color: var(--muted); font-size: 14px; white-space: nowrap; }
+    .progress-track { height: 6px; background: #2b2632; border-radius: 6px; overflow: hidden; margin-top: 10px; }
+    .progress-fill { height: 100%; width: 0; background: var(--good); transition: width 160ms ease; }
+    .nav { margin-top: 10px; }
+    .nav-inner { display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: 8px; }
+    main { padding: 16px 16px 48px; }
+    .course-switch { display: flex; gap: 8px; margin-bottom: 12px; border-bottom: 1px solid var(--border); }
+    .course-switch a { padding: 10px 2px 9px; color: var(--muted); text-decoration: none; border-bottom: 2px solid transparent; }
+    .course-switch a[aria-current="page"] { color: var(--text); border-bottom-color: var(--accent); }
+    .toolbar { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+    .lesson { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    .lesson-header { padding: 16px; border-bottom: 1px solid var(--border); }
+    .meta { display: flex; justify-content: space-between; gap: 10px; color: var(--muted); font-size: 14px; margin-bottom: 8px; }
+    h2 { margin: 0; font-size: 24px; line-height: 1.18; }
+    .lesson-body { padding: 16px; }
+    .section { margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--border); }
+    .section:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
+    h3 { margin: 0 0 8px; font-size: 15px; line-height: 1.3; color: var(--accent); }
+    p { margin: 0 0 10px; }
+    p:last-child { margin-bottom: 0; }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.92em; }
+    .tradeoff, .quiz { border: 1px solid var(--border); background: #211d28; border-radius: 8px; padding: 12px; }
+    .tradeoff strong { color: var(--good); }
+    .answer { display: none; margin-top: 10px; color: var(--text); }
+    .answer.visible { display: block; }
+    .lab { border: 1px solid var(--border); border-radius: 8px; background: #18151d; padding: 12px; }
+    .specimen {
+      min-height: 180px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #f2eee8;
+      color: #28242b;
+      padding: 20px;
+      margin-bottom: 12px;
+      overflow: hidden;
+    }
+    .specimen-title { margin: 0 0 8px; font-weight: 700; line-height: 1.1; }
+    .specimen-copy { margin: 0; max-width: 100%; }
+    .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .field { display: grid; gap: 5px; color: var(--muted); font-size: 13px; }
+    input, select { width: 100%; min-height: 42px; border: 1px solid var(--border); border-radius: 8px; background: #100f14; color: var(--text); padding: 8px; }
+    input[type="range"] { padding: 0; }
+    output { color: var(--text); font-variant-numeric: tabular-nums; }
+    .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .sample { padding: 12px; background: #f2eee8; color: #28242b; border-radius: 6px; min-height: 154px; }
+    .sample-label { display: block; color: #675f69; font: 12px/1.2 ui-monospace, monospace; margin-bottom: 10px; }
+    .done-row { display: grid; grid-template-columns: 22px 1fr; gap: 8px; align-items: center; margin-top: 18px; padding: 12px; border: 1px solid var(--border); border-radius: 8px; background: #211d28; }
+    .done-row input { min-height: 22px; width: 22px; margin: 0; }
+    details { margin-top: 14px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); overflow: hidden; }
+    summary { min-height: var(--tap); display: flex; align-items: center; padding: 12px 14px; cursor: pointer; }
+    .lesson-list { border-top: 1px solid var(--border); max-height: 420px; overflow-y: auto; }
+    .lesson-link { width: 100%; min-height: 50px; border: 0; border-radius: 0; border-bottom: 1px solid var(--border); background: transparent; text-align: left; display: grid; grid-template-columns: 32px 1fr auto; gap: 8px; align-items: center; }
+    .lesson-link.current { background: #25212d; }
+    .lesson-link.complete .lesson-num { color: var(--good); }
+    .lesson-num, .lesson-stage { color: var(--quiet); }
+    .lesson-stage { font-size: 13px; }
+    .sources { color: var(--quiet); font-size: 14px; margin-top: 14px; }
+    @media (max-width: 520px) {
+      .controls, .compare { grid-template-columns: 1fr; }
+      .specimen { min-height: 160px; }
+    }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .progress-fill { transition: none; } }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="title-row"><h1>chew-on-it</h1><div class="counter" id="progressText"></div></div>
+        <div class="progress-track" aria-label="Course progress"><div class="progress-fill" id="progressFill"></div></div>
+        <nav class="nav" aria-label="Lesson navigation"><div class="nav-inner">
+          <button id="prevBtn" type="button">Previous</button>
+          <button id="markNextBtn" class="primary" type="button">Done + Next</button>
+          <button id="nextBtn" type="button">Next</button>
+        </div></nav>
+      </div>
+    </header>
+    <main>
+      <nav class="course-switch" aria-label="Courses">
+        <a href="index.html">React</a><a href="typography.html" aria-current="page">Typography</a>
+      </nav>
+      <div class="toolbar"><button id="resumeBtn" class="primary" type="button">Resume</button><button id="resetBtn" class="ghost" type="button">Reset Progress</button></div>
+      <article class="lesson" aria-live="polite">
+        <div class="lesson-header"><div class="meta"><span id="lessonStage"></span><span id="lessonTime"></span></div><h2 id="lessonTitle"></h2></div>
+        <div class="lesson-body">
+          <section class="section"><h3>Idea</h3><p id="concept"></p></section>
+          <section class="section"><h3>See It Change</h3><div class="lab" id="lab"></div></section>
+          <section class="section"><h3>Tradeoff</h3><div class="tradeoff" id="tradeoff"></div></section>
+          <section class="section"><h3>Quick Check</h3><div class="quiz"><p id="quiz"></p><button id="answerBtn" type="button">Reveal Answer</button><p class="answer" id="answer"></p></div></section>
+          <label class="done-row"><input type="checkbox" id="doneCheck"><span>Mark this bite reviewed</span></label>
+        </div>
+      </article>
+      <details><summary>Course Outline</summary><div class="lesson-list" id="lessonList"></div></details>
+      <p class="sources">Content direction informed by MDN, web.dev, and Butterick’s Practical Typography. Teaching style inspired by Josh Comeau and animations.dev.</p>
+    </main>
+  </div>
+  <script>
+    const lessons = [
+      {stage:'Foundations',time:'3 min',title:'Typography Is a System',concept:'Typography is not choosing a nice font. It is controlling relationships between size, space, weight, width, and color so readers can understand structure without effort.',tradeoff:'A system limits arbitrary choices, but it also creates consistency. Break it only when the content needs a genuinely different role.',quiz:'If every heading is styled independently, what becomes hard to maintain?',answer:'Hierarchy. Small changes create inconsistent relationships because there is no shared scale or role.',demo:'system'},
+      {stage:'Reading',time:'4 min',title:'Line Length Controls Rhythm',concept:'Measure is the width of a line of text. When a line is too wide, the eye works harder to find the next line. When it is too narrow, frequent returns interrupt reading.',tradeoff:'A 45–75 character measure is a useful starting range for prose, not a law. Dense data, captions, and large display text need different measures.',quiz:'Why is making body text full-width on a large monitor usually a mistake?',answer:'The long return path makes it easier to lose your place between lines.',demo:'measure'},
+      {stage:'Reading',time:'4 min',title:'Line Height Creates Air',concept:'Line height is the vertical distance between baselines. It should give letters enough room to form distinct lines without making paragraphs feel disconnected.',tradeoff:'Larger text and short headings usually need tighter line height. Small text and long prose often need more. One global value rarely fits every role.',quiz:'Should a 48px heading and 16px paragraph normally share line-height: 1.5?',answer:'No. The heading will usually look too loose. Larger type typically needs a tighter proportional line height.',demo:'leading'},
+      {stage:'Hierarchy',time:'4 min',title:'Use a Type Scale, Not Guesses',concept:'A type scale gives adjacent text roles a repeatable size relationship. The exact ratio matters less than using a small set of intentional steps.',tradeoff:'Large ratios create drama but consume space and can overwhelm product UI. Small ratios are compact but need weight and spacing to keep hierarchy clear.',quiz:'What does a type scale prevent?',answer:'A pile of nearly identical font sizes chosen one component at a time.',demo:'scale'},
+      {stage:'Hierarchy',time:'3 min',title:'Weight Is Not Hierarchy by Itself',concept:'Bold text attracts attention, but hierarchy comes from combined contrast: size, weight, position, spacing, and color.',tradeoff:'Too many bold elements compete. Use weight to clarify a role, not to make every important thing shout.',quiz:'If everything important is bold, what happens?',answer:'Nothing stands out. The page loses a clear entry point and scanning order.',demo:'weight'},
+      {stage:'Hierarchy',time:'4 min',title:'Spacing Groups Meaning',concept:'Readers assume elements close together belong together. The space above a heading should usually be larger than the space between that heading and its paragraph.',tradeoff:'Tight grouping improves comprehension, but too little space makes the whole page dense. Vary spacing by relationship, not decoration.',quiz:'Which gap should usually be smaller: heading-to-body or previous-section-to-heading?',answer:'Heading-to-body, because those elements form one semantic group.',demo:'spacing'},
+      {stage:'Fonts',time:'4 min',title:'Choose for the Job',concept:'A typeface has a voice, but it also has technical behavior: x-height, width, weight range, glyph coverage, and screen rendering. Evaluate those before personality.',tradeoff:'A distinctive face can strengthen identity while reducing flexibility or readability. A neutral face travels farther but contributes less character.',quiz:'Why should you test a font with real content?',answer:'Its width, punctuation, numerals, language support, and hierarchy may behave differently from a specimen sentence.',demo:'family'},
+      {stage:'Fonts',time:'3 min',title:'Fallbacks Change the Layout',concept:'Web fonts can fail or arrive late. A fallback with different character widths can reflow text and move nearby content.',tradeoff:'System fonts load immediately and are robust. Custom fonts offer stronger identity but add files, latency, and layout-shift risk.',quiz:'What property of a fallback most visibly affects wrapping?',answer:'Character width. A wider or narrower fallback changes where lines break.',demo:'fallback'},
+      {stage:'Detail',time:'3 min',title:'Letter Spacing Is Contextual',concept:'Tracking changes the space between all letters. Large headings often benefit from slightly tighter spacing, while uppercase labels may need a little more room.',tradeoff:'Tracking can tune texture, but heavy adjustments fight the typeface designer’s spacing and reduce legibility.',quiz:'Why is wide letter spacing usually poor for lowercase paragraphs?',answer:'It breaks familiar word shapes and slows continuous reading.',demo:'tracking'},
+      {stage:'Detail',time:'3 min',title:'Contrast Includes Color',concept:'Hierarchy is partly luminance. Muted text can reduce competition, but it must remain readable against its background.',tradeoff:'Low contrast can create calm hierarchy, but it becomes fragile across screens, light conditions, and smaller sizes.',quiz:'Should supporting text always be as faint as possible?',answer:'No. It should be quieter than primary text while still being comfortably readable.',demo:'contrast'},
+      {stage:'Responsive',time:'4 min',title:'Type Responds with Layout',concept:'Typography changes when available space changes. Measure, wrapping, size, and spacing should be tested together at narrow and wide widths.',tradeoff:'Fluid type can smooth transitions, but uncontrolled scaling creates unpredictable hierarchy. Fixed steps are often clearer in product interfaces.',quiz:'What should you inspect after reducing a heading size on mobile?',answer:'Its line breaks, spacing, and relationship to nearby body text, not only the numeric size.',demo:'responsive'},
+      {stage:'Practice',time:'5 min',title:'Diagnose Before You Decorate',concept:'When type feels wrong, name the symptom first: weak hierarchy, tiring measure, loose leading, noisy weights, poor contrast, or broken grouping. Then change one variable.',tradeoff:'Changing one variable feels slower than restyling everything, but it shows cause and effect and produces reusable judgment.',quiz:'Why change one typographic variable at a time?',answer:'It isolates cause and effect, so you learn which decision actually improved the result.',demo:'diagnose'}
+    ];
+
+    const stateKey = 'chew-typography-progress-v1';
+    let state = JSON.parse(localStorage.getItem(stateKey) || '{"index":0,"done":[]}');
+    state.done = Array.isArray(state.done) ? state.done : [];
+    state.index = Math.min(Math.max(Number(state.index) || 0, 0), lessons.length - 1);
+    const $ = id => document.getElementById(id);
+    const sampleText = 'Good typography makes the structure visible before a reader notices the type.';
+
+    function save(){ localStorage.setItem(stateKey, JSON.stringify(state)); }
+    function specimen(inner = sampleText){ return `<div class="specimen"><h4 class="specimen-title">Reading without friction</h4><p class="specimen-copy">${inner}</p></div>`; }
+    function range(id,label,min,max,value,step='1'){ return `<label class="field">${label}: <output id="${id}Out">${value}</output><input id="${id}" type="range" min="${min}" max="${max}" value="${value}" step="${step}"></label>`; }
+    function bindRange(id, unit, apply){ const el=$(id), out=$(id+'Out'); el.addEventListener('input',()=>{out.value=el.value+unit;apply(el.value);}); out.value=el.value+unit; apply(el.value); }
+
+    function renderLab(type){
+      const lab=$('lab');
+      if(type==='system') lab.innerHTML=`<div class="compare"><div class="sample"><span class="sample-label">independent guesses</span><div style="font-size:27px;font-weight:700">A clear title</div><div style="font-size:19px;font-weight:700;margin-top:11px">Section heading</div><p style="font-size:16px">Body copy sits nearby.</p></div><div class="sample"><span class="sample-label">3-step system</span><div style="font-size:28px;font-weight:700;line-height:1.15">A clear title</div><div style="font-size:20px;font-weight:650;margin-top:16px">Section heading</div><p style="font-size:16px;line-height:1.5">Body copy sits nearby.</p></div></div>`;
+      else if(type==='measure'){lab.innerHTML=specimen(sampleText+' '+sampleText)+`<div class="controls">${range('measure','Measure',24,80,58)} </div>`;bindRange('measure','ch',v=>lab.querySelector('.specimen-copy').style.maxWidth=v+'ch');}
+      else if(type==='leading'){lab.innerHTML=specimen(sampleText+' '+sampleText)+`<div class="controls">${range('leading','Line height',1,2,1.5,.05)}${range('bodySize','Font size',12,24,16)}</div>`;bindRange('leading','',v=>lab.querySelector('.specimen-copy').style.lineHeight=v);bindRange('bodySize','px',v=>lab.querySelector('.specimen-copy').style.fontSize=v+'px');}
+      else if(type==='scale'){lab.innerHTML=specimen()+`<div class="controls">${range('ratio','Scale ratio',1.1,1.5,1.25,.05)}</div>`;bindRange('ratio','×',v=>{lab.querySelector('.specimen-title').style.fontSize=(16*v*v)+'px';lab.querySelector('.specimen-copy').style.fontSize='16px';});}
+      else if(type==='weight'){lab.innerHTML=specimen()+`<div class="controls">${range('titleWeight','Title weight',300,900,700,100)}${range('bodyWeight','Body weight',300,700,400,100)}</div>`;bindRange('titleWeight','',v=>lab.querySelector('.specimen-title').style.fontWeight=v);bindRange('bodyWeight','',v=>lab.querySelector('.specimen-copy').style.fontWeight=v);}
+      else if(type==='spacing'){lab.innerHTML=`<div class="specimen"><p style="margin:0">Previous section ends here.</p><h4 class="specimen-title" style="margin-top:32px">A related heading</h4><p class="specimen-copy">This paragraph belongs to the heading.</p></div><div class="controls">${range('before','Before heading',0,60,32)}${range('after','After heading',0,40,8)}</div>`;bindRange('before','px',v=>lab.querySelector('.specimen-title').style.marginTop=v+'px');bindRange('after','px',v=>lab.querySelector('.specimen-title').style.marginBottom=v+'px');}
+      else if(type==='family'){lab.innerHTML=specimen()+`<label class="field">Typeface<select id="family"><option value="system-ui, sans-serif">System sans</option><option value="Georgia, serif">Georgia</option><option value="ui-monospace, monospace">Monospace</option></select></label>`;$('family').addEventListener('change',e=>lab.querySelector('.specimen').style.fontFamily=e.target.value);}
+      else if(type==='fallback'){lab.innerHTML=`<div class="compare"><div class="sample" style="font-family:Georgia,serif"><span class="sample-label">Georgia</span>${sampleText}</div><div class="sample" style="font-family:ui-monospace,monospace"><span class="sample-label">Monospace fallback</span>${sampleText}</div></div>`;}
+      else if(type==='tracking'){lab.innerHTML=specimen()+`<div class="controls">${range('tracking','Letter spacing',-.08,.25,0,.01)}</div>`;bindRange('tracking','em',v=>lab.querySelector('.specimen-copy').style.letterSpacing=v+'em');}
+      else if(type==='contrast'){lab.innerHTML=specimen()+`<div class="controls">${range('tone','Text lightness',25,80,35)}</div>`;bindRange('tone','%',v=>lab.querySelector('.specimen-copy').style.color=`hsl(285 8% ${v}%)`);}
+      else if(type==='responsive'){lab.innerHTML=specimen()+`<div class="controls">${range('viewport','Available width',240,640,480)}</div>`;bindRange('viewport','px',v=>{const s=lab.querySelector('.specimen');s.style.width=Math.min(v,lab.clientWidth-24)+'px';s.querySelector('.specimen-title').style.fontSize=(v<340?24:32)+'px';});}
+      else {lab.innerHTML=specimen(sampleText+' '+sampleText)+`<div class="controls"><label class="field">Symptom<select id="symptom"><option value="measure">Lines feel tiring</option><option value="leading">Lines blur together</option><option value="hierarchy">Title gets lost</option></select></label><button id="applyFix" type="button">Test one change</button></div>`;$('applyFix').addEventListener('click',()=>{const s=$('symptom').value,p=lab.querySelector('.specimen-copy'),h=lab.querySelector('.specimen-title');p.style.maxWidth=s==='measure'?'52ch':'100%';p.style.lineHeight=s==='leading'?'1.65':'1.5';h.style.fontSize=s==='hierarchy'?'30px':'';});}
+    }
+
+    function render(){
+      const lesson=lessons[state.index];
+      $('lessonStage').textContent=lesson.stage;
+      $('lessonTime').textContent=lesson.time;
+      $('lessonTitle').textContent=lesson.title;
+      $('concept').textContent=lesson.concept;
+      $('tradeoff').innerHTML='<strong>Watch for:</strong> '+lesson.tradeoff;
+      $('quiz').textContent=lesson.quiz;
+      $('answer').textContent=lesson.answer;
+      $('answer').classList.remove('visible');
+      $('answerBtn').textContent='Reveal Answer';
+      $('doneCheck').checked=state.done.includes(state.index);
+      $('prevBtn').disabled=state.index===0;
+      $('nextBtn').disabled=state.index===lessons.length-1;
+      $('progressText').textContent=`${state.done.length} of ${lessons.length}`;
+      $('progressFill').style.width=(state.done.length/lessons.length*100)+'%';
+      renderLab(lesson.demo);
+      renderOutline();
+      save();
+    }
+    function renderOutline(){ $('lessonList').innerHTML=lessons.map((l,i)=>`<button class="lesson-link ${i===state.index?'current':''} ${state.done.includes(i)?'complete':''}" data-i="${i}"><span class="lesson-num">${String(i+1).padStart(2,'0')}</span><span>${l.title}</span><span class="lesson-stage">${l.stage}</span></button>`).join('');document.querySelectorAll('.lesson-link').forEach(b=>b.addEventListener('click',()=>{state.index=Number(b.dataset.i);render();scrollTo({top:0,behavior:'smooth'});})); }
+    $('prevBtn').addEventListener('click',()=>{if(state.index>0){state.index--;render();}});
+    $('nextBtn').addEventListener('click',()=>{if(state.index<lessons.length-1){state.index++;render();}});
+    $('markNextBtn').addEventListener('click',()=>{if(!state.done.includes(state.index))state.done.push(state.index);if(state.index<lessons.length-1)state.index++;render();});
+    $('doneCheck').addEventListener('change',e=>{state.done=e.target.checked?[...new Set([...state.done,state.index])]:state.done.filter(i=>i!==state.index);render();});
+    $('answerBtn').addEventListener('click',()=>{const visible=$('answer').classList.toggle('visible');$('answerBtn').textContent=visible?'Hide Answer':'Reveal Answer';});
+    $('resumeBtn').addEventListener('click',()=>{const next=lessons.findIndex((_,i)=>!state.done.includes(i));state.index=next===-1?lessons.length-1:next;render();});
+    $('resetBtn').addEventListener('click',()=>{if(confirm('Reset typography progress?')){state={index:0,done:[]};render();}});
+    render();
+  </script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+{
+  "name": "chew-on-it",
+  "courses": [
+    {
+      "id": "react-fundamentals",
+      "title": "React Fundamentals",
+      "path": "index.html",
+      "status": "available",
+      "chunks": 35,
+      "minutesPerChunk": "3-5",
+      "focus": "Reviewing agent-written React code"
+    },
+    {
+      "id": "typography",
+      "title": "Practical Typography",
+      "path": "typography.html",
+      "status": "available",
+      "chunks": 12,
+      "minutesPerChunk": "3-5",
+      "focus": "Typography systems, tradeoffs, and responsive type"
+    }
+  ],
+  "backlog": [
+    "TypeScript for reviewing agent code",
+    "Git and pull request review basics",
+    "Testing fundamentals for product engineers",
+    "APIs, HTTP, and browser networking",
+    "Data modeling and state design"
+  ]
+}
